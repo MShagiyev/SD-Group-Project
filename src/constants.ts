@@ -1,4 +1,3 @@
-import { createTheme } from "@mui/material";
 export const endpoint_url: string = "http://127.0.0.1:5000"
 export const states: string[] = [
     "AL",
@@ -61,11 +60,3 @@ export const states: string[] = [
     "WI",
     "WY",
   ];
-export const theme = createTheme({
-    palette: {
-      mode: "dark",
-      primary: {
-        main: "#ffffff",
-      },
-    },
-  });

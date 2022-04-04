@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Button from "@mui/material/Button";
 import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
@@ -9,15 +9,17 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
-import { endpoint_url, theme } from "src/constants";
+import { endpoint_url } from "src/constants";
+import useThemes from "src/themes";
 
-
-
-export default function Login() {
+export default function Login(props: any) {
+  const { auth_theme } = useThemes();
+  const nav_to = useNavigate();
+  
   const [emailState, setEmailState] = React.useState("");
   const [errors, setErrors] = React.useState({ email: null, password: null });
-  const nav_to = useNavigate();
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     fetch(`${endpoint_url}`, {
@@ -25,13 +27,12 @@ export default function Login() {
       body: data,
     })
       .then((res) => {
-        if (res.status === 200) return;
         return res.json();
       })
       .then((data) => {
-        if (!data) {
-          console.log("Signed in succesfully.");
-          nav_to("/profile", { replace: true });
+        if ('token' in data) {
+          props.setToken(data.token)
+          nav_to("/profile", {replace: true, state: null});
           return
         }
         for (const err in data) {
@@ -40,12 +41,11 @@ export default function Login() {
             [err]: data[err][0],
           }));
         }
-        console.log(data);
       });
   };
-
+  
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={auth_theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box

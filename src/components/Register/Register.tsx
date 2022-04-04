@@ -9,10 +9,12 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
-import { endpoint_url, theme } from "src/constants";
+import { endpoint_url } from "src/constants";
+import useThemes from "src/themes";
 
 
-export default function Register() {
+export default function Register(props: any) {
+  const { auth_theme } = useThemes()
   const [emailState, setEmailState] = React.useState("");
   const [errors, setErrors] = React.useState({email: null, password: null})
   const nav_to = useNavigate();
@@ -26,13 +28,13 @@ export default function Register() {
       body: data
     })
     .then( (res) => {
-      if(res.status === 200) return;
       return res.json()
     })
     .then( (data) => {
-      if(!data){
+      if('token' in data){
         console.log("Registered successfully.")
-        nav_to("/profile", {replace: true})
+        props.setToken(data.token)
+        nav_to("/profile", {replace: true, state: "Success"})
         return
       }
       for (const err in data) {
@@ -46,7 +48,7 @@ export default function Register() {
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <ThemeProvider theme={auth_theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box

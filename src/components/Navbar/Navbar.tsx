@@ -7,13 +7,14 @@ import {
   IconButton,
   useTheme,
 } from "@mui/material";
-import { ColorModeContext } from "src/App";
 import { Link } from "react-router-dom";
 import "./Navbar.scss";
 import { LightMode, Brightness3 } from "@mui/icons-material";
+import useThemes from "src/themes";
 
-const Navbar = () => {
+const Navbar = (props: any) => {
   const theme = useTheme();
+  const { ColorModeContext } = useThemes()
   const context = React.useContext(ColorModeContext);
   return (
     <AppBar position="static">
@@ -29,7 +30,7 @@ const Navbar = () => {
           <Link to="/quote" className="link">
             Get a Quote
           </Link>
-          <Link to="/" className="link">
+          <Link to="/" className="link" onClick={() => {props.removeToken()}}>
             Sign out
           </Link>
           <IconButton
@@ -37,7 +38,7 @@ const Navbar = () => {
             onClick={context.toggleColorMode}
             color="inherit"
           >
-            {theme.palette.mode === "dark" ? <LightMode /> : <Brightness3 />}
+            {theme.palette.mode === "dark" ? <LightMode/> : <Brightness3/>}
           </IconButton>
         </div>
       </Toolbar>

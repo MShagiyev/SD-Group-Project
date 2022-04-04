@@ -1,46 +1,92 @@
-import React, {useState} from "react";
+import React from "react";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
+import { ThemeProvider } from "@mui/material";
 import Login from "./components/Login/Login";
 import Profile from "./components/Profile/Profile";
 import Quote from "./components/Quote/Quote";
 import Register from "./components/Register/Register";
-import { createTheme, ThemeProvider } from "@mui/material";
-
-const ColorModeContext = React.createContext({ toggleColorMode: () => {} });
+import useAuth from "./verify";
+import useThemes from "./themes";
+import Navbar from "./components/Navbar/Navbar";
+import {ReactComponent as LoadingIcon } from './loading_icon.svg'
 
 function App() {
-  const [mode, setMode] = useState<"light" | "dark">("light");
-  const colorMode = React.useMemo(
-    () => ({
-      toggleColorMode: () => {
-        setMode((prevMode) => (prevMode === 'light' ? 'dark' : 'light'));
-      },
-    }),
-    [],
-  );
-  // const Reference = React.createContext({ mode, setMode, colorMode })
-  const theme = createTheme({
-    palette: {
-      mode: mode,
-      primary: {
-        main: "#ffffff",
-      },
-      secondary:
-      {
-        main: "#707371"
-      }
-    },
-  });
+  const { main_theme, ColorModeContext, setMode } = useThemes();
+  const {
+    token,
+    id,
+    removeToken,
+    setToken,
+    isValidToken,
+    PrivateRoute,
+    loading,
+    isInit,
+    setInit
+  } = useAuth();
+  if(loading){
+    return (
+      <div>
+        <LoadingIcon/>
+      </div>
+    )
+  }
   return (
-    <ColorModeContext.Provider value={colorMode}>
-      <ThemeProvider theme={theme}>
+    <ColorModeContext.Provider value={setMode}>
+      <ThemeProvider theme={main_theme}>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate replace to="/login" />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/quote" element={<Quote />} />
+            <Route
+              path="/login"
+              element={
+                !isValidToken && !loading ? (
+                  <Login setToken={setToken} />
+                ) : (
+                  <Navigate
+                    to="/profile"
+                    replace
+                    state={"Already logged in."}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/register"
+              element={
+                !isValidToken && !loading ? (
+                  <Register setToken={setToken} />
+                ) : (
+                  <Navigate
+                    to="/profile"
+                    replace
+                    state={"Already logged in."}
+                  />
+                )
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <>
+                    <Navbar removeToken={removeToken} />
+                    <Profile token={token} id={id} isInit={isInit} setInit={setInit} />
+                  </>
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/quote"
+              element={
+                <PrivateRoute>
+                  <>
+                    <Navbar removeToken={removeToken} />
+                    <Quote token={token} id={id}/>
+                  </>
+                </PrivateRoute>
+              }
+            />
+            {/* catches all other paths. could make a not found component if time allows but redirecting to login is sufficient for now */}
+            <Route path="*" element={<Navigate replace to="/login" />} />
           </Routes>
         </BrowserRouter>
       </ThemeProvider>
@@ -48,7 +94,4 @@ function App() {
   );
 }
 
-export {
-  ColorModeContext,
-  App
-};
+export default App;
