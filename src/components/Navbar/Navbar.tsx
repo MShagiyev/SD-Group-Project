@@ -30,6 +30,9 @@ const Navbar = (props: any) => {
           <Link to="/quote" className="link">
             Get a Quote
           </Link>
+          <Link to="/history" className="link">
+            History
+          </Link>
           <Link to="/" className="link" onClick={() => {props.removeToken()}}>
             Sign out
           </Link>

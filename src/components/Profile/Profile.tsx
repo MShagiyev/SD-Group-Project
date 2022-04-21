@@ -170,7 +170,7 @@ export default function Profile(props: any) {
                   variant="standard"
                   error={errors.add2 !== null ? true : false}
                   helperText={errors.add2 !== null ? errors.add2 : ""}
-                  value={profile["add2"]}
+                  value={(profile["add2"] === null) ? "" : profile["add2"]}
                   onChange={(e) => {
                     setProfile({...profile, add2: e.target.value})
                     if (errors.add2 !== null)

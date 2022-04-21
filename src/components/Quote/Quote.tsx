@@ -9,6 +9,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { endpoint_url } from "src/constants";
+import { useNavigate } from "react-router-dom";
 import "./Quote.scss"
 
 
@@ -20,6 +21,7 @@ export default function Quote(props: any) {
   const [fetchStatus, updateFetch] = React.useState<boolean>(false);
   const [fullAddress, setAddress] = React.useState<string>("")
   const [addLine2, setAddLine2] = React.useState<string>("")
+  const nav_to = useNavigate()
 
   const [errors, setErrors] = React.useState<any>({
     date: null,
@@ -91,6 +93,7 @@ export default function Quote(props: any) {
       .then((data) => {
         if (!data){
           alert(`Successfully made quote on ${dateState?.toDateString()} for $${totalState}. Thank you!`)
+          nav_to('/history', {replace: true})
           return;
         } 
         console.log(data);
@@ -115,7 +118,7 @@ export default function Quote(props: any) {
       })
       const add_data = await res.json()
       setAddress(add_data["full_add"])
-      setAddLine2(add_data["add2"])
+      setAddLine2((add_data["add2"] === null) ? "" : add_data["add2"])
       updateFetch(true)
     }
     if(!fetchStatus && props.id != "")

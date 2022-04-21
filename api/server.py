@@ -1,5 +1,4 @@
-from crypt import methods
-from flask import request, make_response
+from flask import jsonify, request, make_response
 from flask import current_app as app
 from flask_jwt_extended import (create_access_token, get_jwt_identity, get_jwt, jwt_required, decode_token)
 from werkzeug.security import (generate_password_hash)
@@ -85,6 +84,12 @@ def get_profile():
     }
     return make_response(res, 200)
 
+@app.route('/get-history', methods=['GET'])
+def get_history():
+    user_id = request.values["id"]
+    all_quotes = Quote.query.filter( Quote.user_id == user_id).all()
+    quotes = [quote.to_dict() for quote in all_quotes]
+    return json.dumps(quotes)
 #Persist data within post routes
 #login post route
 @app.route('/', methods=['POST'])

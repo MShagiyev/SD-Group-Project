@@ -5,6 +5,7 @@ import Login from "./components/Login/Login";
 import Profile from "./components/Profile/Profile";
 import Quote from "./components/Quote/Quote";
 import Register from "./components/Register/Register";
+import QuoteHistory from "./components/History/History";
 import useAuth from "./verify";
 import useThemes from "./themes";
 import Navbar from "./components/Navbar/Navbar";
@@ -81,6 +82,18 @@ function App() {
                   <>
                     <Navbar removeToken={removeToken} />
                     <Quote token={token} id={id}/>
+                  </>
+                </PrivateRoute>
+              }
+            />
+
+            <Route
+              path="/history"
+              element={
+                <PrivateRoute>
+                  <>
+                    <Navbar removeToken={removeToken} />
+                    <QuoteHistory token={token} id={id}/>
                   </>
                 </PrivateRoute>
               }

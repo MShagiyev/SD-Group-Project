@@ -1,4 +1,4 @@
-from sqlalchemy import func
+from sqlalchemy import func, inspect
 from sqlalchemy.orm import relationship, backref
 from . import db
 
@@ -89,7 +89,5 @@ class Quote(db.Model):
         db.String(10),
         nullable=False
     )
-
-    # user who made the quote
-    # quote amount
-    # date of the quote
+    def to_dict(self):
+        return { quote.key: getattr(self, quote.key) for quote in inspect(self).mapper.column_attrs }
