@@ -25,4 +25,5 @@ yarn-error.log*
 .vscode
 venv
 .env
+.coverage
 __pycache__

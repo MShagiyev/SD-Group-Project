@@ -15,7 +15,7 @@ const QuoteHistory = (props: any) => {
         fetch(`${endpoint_url}/get-history?id=${props.id}`, {
             method: "GET",
             headers: {
-                Authorization: "Bearer" + props.token,
+                Authorization: "Bearer " + props.token,
             },
         })
             .then((res) => {
@@ -30,7 +30,7 @@ const QuoteHistory = (props: any) => {
         return <></>;
     }
     return (
-        <Paper sx={{ width: "50vh", overflow: "hidden", margin: "64px auto"}}>
+        <Paper sx={{ width: "40vh", overflow: "hidden", margin: "64px auto"}}>
             <TableContainer sx={{maxHeight: "60vh"}}>
                 <Table stickyHeader aria-label="History">
                     <TableHead>
@@ -45,7 +45,7 @@ const QuoteHistory = (props: any) => {
                                 <TableRow
                                     key={quote.id}
                                     sx={{
-                                        "&:last-child td, &:last-child th": {
+                                            "&:last-child td, &:last-child th": {
                                             border: 0,
                                         },
                                     }}
@@ -59,7 +59,7 @@ const QuoteHistory = (props: any) => {
                             ))
                         ) : (
                             <TableRow>
-                                <TableCell align="center">
+                                <TableCell>
                                     No quote history. Make one today.
                                 </TableCell>
                             </TableRow>

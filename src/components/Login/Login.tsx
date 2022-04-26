@@ -22,7 +22,7 @@ export default function Login(props: any) {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    fetch(`${endpoint_url}`, {
+    fetch(`${endpoint_url}/login`, {
       method: "POST",
       body: data,
     })

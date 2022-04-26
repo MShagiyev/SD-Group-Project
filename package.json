@@ -34,7 +34,10 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "api_mac": "cd api && source venv/bin/activate && flask run",
-    "api_win": "cd api && venv\\Scripts\\activate.bat && flask run"
+    "api_win": "cd api && venv\\Scripts\\activate.bat && flask run",
+    "test_api": "cd api && python -m coverage run -m unittest discover",
+    "report": "cd api && coverage report",
+    "web_report": "cd api && coverage html"
   },
   "eslintConfig": {
     "extends": [

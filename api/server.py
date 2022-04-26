@@ -6,9 +6,8 @@ from werkzeug.security import (generate_password_hash)
 from datetime import datetime, timezone, timedelta
 import json
 
-from .forms import (LoginForm, ProfileForm, QuoteForm, RegisterForm)
-from .models import (User, Quote, Address)
-from . import db
+from forms import (LoginForm, ProfileForm, QuoteForm, RegisterForm)
+from models import (User, Quote, Address, db)
 
 @app.after_request
 def refresh_tokens(response):
@@ -35,14 +34,14 @@ def is_init():
     decoded = decode_token(token)
     if "sub" in decoded:
         user = User.query.filter( User.email == decoded["sub"] ).first()
-        return {"id": user.id, 
+        return {"id": user.email, 
                 "init": "true" if (user.fullName or user.address_id) else "false"} 
     return decoded
 @app.route('/get_quote_details', methods=['GET'])
 @jwt_required()
 def get_quote_details():
     user_id = request.values["id"]
-    user = User.query.filter( User.id == user_id ).first()
+    user = User.query.filter( User.email == user_id ).first()
     address = Address.query.filter( Address.id == user.address_id ).first()
     reqs = [address.addLine1, address.city, address.state, address.zip_code]
     formatted_address = ", ".join([add_line for add_line in reqs])
@@ -53,7 +52,7 @@ def get_quote():
     try:
         user_id = request.values["id"]
         gallons = request.values["galls"]
-        user = User.query.filter( User.id == user_id ).first()
+        user = User.query.filter( User.email == user_id ).first()
         address = Address.query.filter( Address.id == user.address_id ).first()
 
         location_factor = .02 if address.state == "TX" else .04
@@ -72,7 +71,7 @@ def get_quote():
 @jwt_required()
 def get_profile():
     user_id = request.values["id"]
-    user = User.query.filter( User.id == user_id ).first()
+    user = User.query.filter( User.email == user_id ).first()
     address = Address.query.filter( Address.id == user.address_id ).first()
     res = {
         'fullName': user.fullName,
@@ -85,14 +84,16 @@ def get_profile():
     return make_response(res, 200)
 
 @app.route('/get-history', methods=['GET'])
+@jwt_required()
 def get_history():
     user_id = request.values["id"]
-    all_quotes = Quote.query.filter( Quote.user_id == user_id).all()
+    user = User.query.filter( User.email == user_id ).first()
+    all_quotes = Quote.query.filter( Quote.user_id == user.id ).all()
     quotes = [quote.to_dict() for quote in all_quotes]
     return json.dumps(quotes)
 #Persist data within post routes
 #login post route
-@app.route('/', methods=['POST'])
+@app.route('/login', methods=['POST'])
 def login():
     login_form = LoginForm(request.form)
     if not login_form.validate():
@@ -112,7 +113,7 @@ def profile_details():
         return make_response(prof_form.errors, 400)
     details = prof_form.data
     
-    user = User.query.filter(User.id == int(details["id"])).first()
+    user = User.query.filter(User.email == details["id"]).first()
     if not user.fullName:
         new_address = Address(
             addLine1 = details["add1"],
@@ -123,7 +124,7 @@ def profile_details():
         ) 
         db.session.add(new_address)
         db.session.flush()
-        db.session.query(User).filter(User.id == int(details["id"])).\
+        db.session.query(User).filter(User.email == details["id"]).\
                                 update({'fullName': details["fullName"],
                                         'hasQuoted': False,
                                         'address_id': new_address.id
@@ -138,7 +139,7 @@ def profile_details():
             'city': details["city"],
             'zip_code': details["zipCode"]
         })
-        User.query.filter(User.id == int(details["id"])).\
+        User.query.filter(User.email== details["id"]).\
         update({
             'fullName': details["fullName"]
         })
@@ -170,8 +171,9 @@ def submit_quote():
     quote_form = QuoteForm(request.form)
     if not quote_form.validate():
         return make_response(quote_form.errors, 400)
+    user = User.query.filter(User.email == quote_form.id.data).first()
     new_quote = Quote(
-        user_id = int(quote_form.id.data),
+        user_id = user.id,
         total = quote_form.total.data,
         date = quote_form.date.data
     )

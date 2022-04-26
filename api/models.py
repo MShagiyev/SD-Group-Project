@@ -1,6 +1,6 @@
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import relationship, backref
-from . import db
+from init_app import db
 
 
 class User(db.Model):

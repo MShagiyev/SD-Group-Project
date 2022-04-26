@@ -4,11 +4,10 @@ from wtforms import (StringField, PasswordField,
 from wtforms.validators import (
     InputRequired, Length, Email, DataRequired, NumberRange, Optional, AnyOf)
 from werkzeug.security import check_password_hash
-from .constants import states
+from constants import states
 from datetime import datetime
 from re import match
-from .models import User
-from . import db
+from models import User
 
 class IsDate(object):
     def __init__(self, message=None) -> None:
@@ -75,7 +74,7 @@ class LoginForm(FlaskForm):
             raise ValidationError("Invalid email or password.")
 
 class ProfileForm(FlaskForm):
-    id = IntegerField('User ID')
+    id = StringField('User Email')
     fullName = StringField('Full Name', validators=[
         InputRequired("Please enter a name."),
         Length(min=1, max=32, message="Please enter a name between 1-32 characters."),
@@ -106,7 +105,7 @@ class ProfileForm(FlaskForm):
 
 
 class QuoteForm(FlaskForm):
-    id = IntegerField('User ID')
+    id = StringField('User Email')
     gallons = IntegerField('Gallons', validators=[InputRequired(
         message="Please enter a number."), NumberRange(min=1, message="Please enter a number greater than 0."),])
     total = DecimalField('Total', validators=[InputRequired(), NumberRange(
